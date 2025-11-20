@@ -15,6 +15,16 @@ int main()
 	VideoMode vm(1920, 1080);
 	// Create and open a window for the game
 	RenderWindow window(vm, "Chaos Game!!", Style::Default);
+
+	Font font;
+	font.loadFromFile("font/RobotoSlab-Black.ttf");
+
+	Text message;
+	message.setFont(font);
+	message.setString("Please click 3 dots");
+	message.setFillColor(Color::White);
+
+	//srand(time(0));
 	
 	vector<Vector2f> vertices;
 	vector<Vector2f> points;
@@ -50,6 +60,7 @@ int main()
 			    {
 				///fourth click
 				///push back to points vector
+				points.push_back(Vector2f(event.mouseButton.x, event.mouseButton.y));
 			    }
 			}
 		    }
@@ -70,6 +81,19 @@ int main()
 		    ///select random vertex
 		    ///calculate midpoint between random vertex and the last point in the vector
 		    ///push back the newly generated coord.
+
+			int randNum = rand() % 3;
+
+			Vector2f randVert = vertices[randNum];
+
+			Vector2f latestPoint = points.back();
+			Vector2f newPoint;
+
+			newPoint.x = (randVert.x + latestPoint.x) / 2;
+			newPoint.y = (randVert.y + latestPoint.y) / 2;
+
+			points.push_back(newPoint);
+
 		}
 	
 		/*
@@ -86,6 +110,14 @@ int main()
 		    window.draw(rect);
 		}
 		///TODO:  Draw points
+		for (int i = 0; i < points.size(); i++)
+		{
+			CircleShape circle(10);
+			circle.setPosition(points[i]);
+			circle.setFillColor(Color::Blue);
+			window.draw(circle);
+		}
+		window.draw(message);
 		window.display();
 	}
 }
