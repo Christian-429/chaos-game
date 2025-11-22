@@ -9,10 +9,13 @@
 using namespace sf;
 using namespace std;
 
+
 int main()
 {
 	// Create a video mode object
-	VideoMode vm(1920, 1080);
+	int pixelWidth = VideoMode::getDesktopMode().width;
+	int pixelHeight = VideoMode::getDesktopMode().height;
+	VideoMode vm(pixelWidth, pixelHeight);
 	// Create and open a window for the game
 	RenderWindow window(vm, "Chaos Game!!", Style::Default);
 
@@ -21,13 +24,17 @@ int main()
 
 	Text message;
 	message.setFont(font);
-	message.setString("Please click 3 dots");
+	message.setString("Please click the mouse in 4 different spots.");
 	message.setFillColor(Color::White);
 
 	//srand(time(0));
 	
 	vector<Vector2f> vertices;
 	vector<Vector2f> points;
+	const float RATIO = 0.5;
+	const int VERTS = 3;
+	int lastVert = -1;
+
 
 	while (window.isOpen())
 	{
@@ -52,7 +59,7 @@ int main()
 			    std::cout << "mouse x: " << event.mouseButton.x << std::endl;
 			    std::cout << "mouse y: " << event.mouseButton.y << std::endl;
 	
-			    if(vertices.size() < 3)
+			    if(vertices.size() < VERTS)
 			    {
 				vertices.push_back(Vector2f(event.mouseButton.x, event.mouseButton.y));
 			    }
@@ -81,18 +88,28 @@ int main()
 		    ///select random vertex
 		    ///calculate midpoint between random vertex and the last point in the vector
 		    ///push back the newly generated coord.
+			for (int i = 0; i < 2; i++)
+			{
+				int randNum = rand() % VERTS;
+				//check to see if vertice is use twice in a row
+				while (randNum == lastVert && VERTS > 3)
+				{
+					randNum = rand() % VERTS;
+				}
+				lastVert = randNum;
+				Vector2f randVert = vertices[randNum];
+				Vector2f latestPoint = points.back();
+				Vector2f newPoint;
 
-			int randNum = rand() % 3;
 
-			Vector2f randVert = vertices[randNum];
 
-			Vector2f latestPoint = points.back();
-			Vector2f newPoint;
 
-			newPoint.x = (randVert.x + latestPoint.x) / 2;
-			newPoint.y = (randVert.y + latestPoint.y) / 2;
+				newPoint.x = latestPoint.x + (randVert.x - latestPoint.x) * RATIO;
+				newPoint.y = latestPoint.y + (randVert.y - latestPoint.y) * RATIO;
 
-			points.push_back(newPoint);
+				points.push_back(newPoint);
+			}
+			
 
 		}
 	
@@ -104,17 +121,17 @@ int main()
 		window.clear();
 		for(int i = 0; i < vertices.size(); i++)
 		{
-		    RectangleShape rect(Vector2f(10,10));
-		    rect.setPosition(Vector2f(vertices[i].x, vertices[i].y));
-		    rect.setFillColor(Color::Blue);
-		    window.draw(rect);
+		    CircleShape circle(1);
+		    circle.setPosition(vertices[i]);
+		    circle.setFillColor(Color::Red);
+		    window.draw(circle);
 		}
 		///TODO:  Draw points
 		for (int i = 0; i < points.size(); i++)
 		{
-			CircleShape circle(10);
+			CircleShape circle(1);
 			circle.setPosition(points[i]);
-			circle.setFillColor(Color::Blue);
+			circle.setFillColor(Color::Red);
 			window.draw(circle);
 		}
 		window.draw(message);
